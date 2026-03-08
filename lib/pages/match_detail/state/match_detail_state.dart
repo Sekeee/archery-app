@@ -14,6 +14,9 @@ class MatchDetailState {
   // Current end (1-indexed)
   final RxInt currentEnd = 1.obs;
   
+  // Currently selected arrow index within the current end (0-indexed)
+  final RxInt selectedArrowIndex = 0.obs;
+  
   // Scores: List of ends, each end is a list of arrow scores
   // e.g., [[10, 9, 8], [10, 10, 9], ...]
   final RxList<List<int>> scores = <List<int>>[].obs;

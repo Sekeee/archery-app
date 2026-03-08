@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../core/services/match_service.dart';
 import '../../../core/services/user_service.dart';
 import '../../../routes/app_routes.dart';
 import '../state/home_state.dart';
@@ -7,12 +8,18 @@ import '../state/home_state.dart';
 class HomeController extends GetxController {
   final state = HomeState();
   final UserService _userService = UserService();
+  final MatchService _matchService = MatchService();
 
   @override
   void onInit() {
     super.onInit();
-    _loadUserData();
-    _loadRecentMatches();
+    _loadAll();
+  }
+
+  Future<void> _loadAll() async {
+    await _loadUserData();
+    await _loadRecentMatches();
+    _updateCategoryStats();
   }
 
   Future<void> _loadUserData() async {
@@ -24,7 +31,6 @@ class HomeController extends GetxController {
         state.userName.value = user.username;
         state.photoUrl.value = user.photoUrl;
         
-        // Load stats for selected category
         _updateCategoryStats();
       }
     } catch (e) {
@@ -35,13 +41,30 @@ class HomeController extends GetxController {
   }
 
   void _updateCategoryStats() {
-    final user = state.currentUser.value;
-    if (user == null) return;
-    
-    final stats = user.getStats(state.selectedCategory.value);
-    state.totalMatches.value = stats.totalMatches;
-    state.avgAccuracy.value = stats.avgAccuracy;
-    state.bestScore.value = stats.bestScore;
+    final category = state.selectedCategory.value;
+    final matches = state.recentMatches
+        .where((m) => m['category'] == category)
+        .toList();
+
+    state.totalMatches.value = matches.length;
+
+    if (matches.isEmpty) {
+      state.avgAccuracy.value = 0.0;
+      state.bestScore.value = 0;
+      return;
+    }
+
+    int best = 0;
+    int completedCount = 0;
+    for (final m in matches) {
+      final score = (m['score'] ?? 0) as int;
+      if (score > best) best = score;
+      if (m['isCompleted'] == true) completedCount++;
+    }
+    state.bestScore.value = best;
+    state.avgAccuracy.value = matches.isEmpty
+        ? 0.0
+        : (completedCount / matches.length * 100);
   }
 
   void onCategorySelected(String category) {
@@ -49,32 +72,19 @@ class HomeController extends GetxController {
     _updateCategoryStats();
   }
 
-  void _loadRecentMatches() {
-    // TODO: Load actual match data
-    state.recentMatches.value = [
-      {
-        'name': 'March 03 Morning Class',
-        'matchType': 'Range',
-        'category': 'Range',
-        'date': DateTime(2026, 3, 3),
-        'ends': 10,
-        'arrowsPerEnd': 3,
-        'score': 186,
-        'rank': 3,
-        'isCompleted': true,
-      },
-      {
-        'name': 'March 05 Training',
-        'matchType': 'Moving Object',
-        'category': 'Moving Object',
-        'date': DateTime(2026, 3, 5),
-        'ends': 10,
-        'arrowsPerEnd': 3,
-        'score': 172,
-        'rank': 1,
-        'isCompleted': true,
-      },
-    ];
+  Future<void> _loadRecentMatches() async {
+    final user = state.currentUser.value;
+    if (user == null) {
+      state.recentMatches.value = [];
+      return;
+    }
+    try {
+      final matches = await _matchService.fetchUserMatches(user.uid);
+      state.recentMatches.value = matches;
+    } catch (e) {
+      print('Error loading matches: $e');
+      state.recentMatches.value = [];
+    }
   }
 
   void onBottomNavTap(int index) {
@@ -114,5 +124,7 @@ class HomeController extends GetxController {
 
   Future<void> refreshUserData() async {
     await _loadUserData();
+    await _loadRecentMatches();
+    _updateCategoryStats();
   }
 }

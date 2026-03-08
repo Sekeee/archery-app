@@ -38,6 +38,18 @@ class MatchDetailView extends GetView<MatchDetailController> {
                 : Icon(Icons.save_outlined, color: context.textPrimaryColor),
             onPressed: controller.state.isLoading.value ? null : controller.saveMatch,
           )),
+          Obx(() => TextButton(
+            onPressed: controller.state.isLoading.value ? null : controller.finishMatch,
+            child: Text(
+              'End Match',
+              style: TextStyle(
+                color: controller.state.isCompleted.value
+                    ? AppColors.primary
+                    : AppColors.error,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )),
         ],
       ),
       body: Builder(
@@ -84,14 +96,18 @@ class MatchDetailView extends GetView<MatchDetailController> {
           Container(
             height: 50,
             color: context.surfaceColor,
-            child: Obx(() => ListView.builder(
+            child: Obx(() {
+              final currentEnd = controller.state.currentEnd.value;
+              final totalEnds = controller.state.totalEnds.value;
+              final scores = controller.state.scores.toList();
+              return ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              itemCount: controller.state.totalEnds.value,
+              itemCount: totalEnds,
               itemBuilder: (context, index) {
-                final isSelected = controller.state.currentEnd.value == index + 1;
-                final endScores = controller.state.scores.isNotEmpty && index < controller.state.scores.length
-                    ? controller.state.scores[index]
+                final isSelected = currentEnd == index + 1;
+                final endScores = scores.isNotEmpty && index < scores.length
+                    ? scores[index]
                     : <int>[];
                 final isComplete = endScores.isNotEmpty && endScores.every((s) => s >= 0);
                 
@@ -119,7 +135,8 @@ class MatchDetailView extends GetView<MatchDetailController> {
                   ),
                 );
               },
-            )),
+            );
+            }),
           ),
           
           const SizedBox(height: 16),
@@ -128,11 +145,14 @@ class MatchDetailView extends GetView<MatchDetailController> {
           Expanded(
             child: Obx(() {
               final endIndex = controller.state.currentEnd.value - 1;
-              if (endIndex >= controller.state.scores.length) {
+              final selectedArrow = controller.state.selectedArrowIndex.value;
+              final allScores = controller.state.scores.toList();
+              
+              if (endIndex >= allScores.length) {
                 return const Center(child: Text('Loading...'));
               }
               
-              final endScores = controller.state.scores[endIndex];
+              final endScores = allScores[endIndex];
               
               return SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -149,7 +169,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'End ${controller.state.currentEnd.value}',
+                            'End ${endIndex + 1}',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -170,41 +190,86 @@ class MatchDetailView extends GetView<MatchDetailController> {
                     const SizedBox(height: 16),
                     
                     // Arrow scores display
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(endScores.length, (arrowIndex) {
-                        final score = endScores[arrowIndex];
-                        return Container(
-                          width: 60,
-                          height: 60,
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            color: score >= 0 ? _getScoreColor(score) : context.backgroundColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: score >= 0 ? _getScoreColor(score) : context.textSecondaryColor,
-                              width: 2,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(endScores.length, (arrowIndex) {
+                          final score = endScores[arrowIndex];
+                          final isSelected = selectedArrow == arrowIndex;
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => controller.selectArrow(arrowIndex),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                              child: Column(
+                                children: [
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: isSelected ? 66 : 56,
+                                    height: isSelected ? 66 : 56,
+                                    decoration: BoxDecoration(
+                                      color: score >= 0 ? _getScoreColor(score) : context.backgroundColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? AppColors.primaryLight
+                                            : score >= 0 ? _getScoreColor(score) : context.borderColor,
+                                        width: isSelected ? 4 : 2,
+                                      ),
+                                      boxShadow: isSelected
+                                          ? [BoxShadow(
+                                              color: AppColors.primary.withValues(alpha: 0.5),
+                                              blurRadius: 12,
+                                              spreadRadius: 3,
+                                            )]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      score >= 0 ? score.toString() : '-',
+                                      style: TextStyle(
+                                        fontSize: isSelected ? 26 : 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: score >= 0 
+                                            ? _getScoreTextColor(score, isMiss: score == 0)
+                                            : context.textSecondaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // Arrow label
+                                  Text(
+                                    '${arrowIndex + 1}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      color: isSelected ? AppColors.primaryLight : context.textSecondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            score >= 0 ? (score == 0 ? 'M' : score.toString()) : '-',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: score >= 0 
-                                  ? (score >= 9 ? Colors.black : AppColors.textOnPrimary)
-                                  : context.textSecondaryColor,
-                            ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
                     
-                    const SizedBox(height: 24),
+                    // Selected arrow indicator
+                    const SizedBox(height: 8),
+                    Text(
+                      'Arrow ${selectedArrow + 1} selected',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.primaryLight,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
                     
                     // Score input buttons
-                    _buildScoreInputGrid(endIndex, endScores),
+                    _buildScoreInputGrid(endIndex),
                     
                     const SizedBox(height: 24),
                     
@@ -328,43 +393,35 @@ class MatchDetailView extends GetView<MatchDetailController> {
     );
   }
 
-  Widget _buildScoreInputGrid(int endIndex, List<int> endScores) {
-    // Find first unscored arrow
-    int targetArrow = endScores.indexWhere((s) => s < 0);
-    if (targetArrow == -1) targetArrow = endScores.length - 1; // All scored, allow edit of last
-    
+  Widget _buildScoreInputGrid(int endIndex) {
     return Column(
       children: [
-        // Row 1: X, 10, 9, 8, 7
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildScoreButton('X', 10, endIndex, targetArrow, isX: true),
-            _buildScoreButton('10', 10, endIndex, targetArrow),
-            _buildScoreButton('9', 9, endIndex, targetArrow),
-            _buildScoreButton('8', 8, endIndex, targetArrow),
-            _buildScoreButton('7', 7, endIndex, targetArrow),
+            _buildScoreButton('10', 10, endIndex),
+            _buildScoreButton('9', 9, endIndex),
+            _buildScoreButton('8', 8, endIndex),
+            _buildScoreButton('7', 7, endIndex),
+            _buildScoreButton('6', 6, endIndex),
           ],
         ),
         const SizedBox(height: 8),
-        // Row 2: 6, 5, 4, 3, 2
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildScoreButton('6', 6, endIndex, targetArrow),
-            _buildScoreButton('5', 5, endIndex, targetArrow),
-            _buildScoreButton('4', 4, endIndex, targetArrow),
-            _buildScoreButton('3', 3, endIndex, targetArrow),
-            _buildScoreButton('2', 2, endIndex, targetArrow),
+            _buildScoreButton('5', 5, endIndex),
+            _buildScoreButton('4', 4, endIndex),
+            _buildScoreButton('3', 3, endIndex),
+            _buildScoreButton('2', 2, endIndex),
+            _buildScoreButton('1', 1, endIndex),
           ],
         ),
         const SizedBox(height: 8),
-        // Row 3: 1, M (miss)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildScoreButton('1', 1, endIndex, targetArrow),
-            _buildScoreButton('M', 0, endIndex, targetArrow, isMiss: true),
+            _buildScoreButton('0', 0, endIndex, isMiss: true),
           ],
         ),
       ],
@@ -374,13 +431,11 @@ class MatchDetailView extends GetView<MatchDetailController> {
   Widget _buildScoreButton(
     String label,
     int score,
-    int endIndex,
-    int arrowIndex, {
-    bool isX = false,
+    int endIndex, {
     bool isMiss = false,
   }) {
     return GestureDetector(
-      onTap: () => controller.recordScore(endIndex, arrowIndex, score),
+      onTap: () => controller.recordScore(endIndex, score),
       child: Container(
         width: 56,
         height: 56,
@@ -388,9 +443,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
         decoration: BoxDecoration(
           color: isMiss
               ? Colors.grey[300]
-              : isX
-                  ? AppColors.gold
-                  : _getScoreColor(score),
+              : _getScoreColor(score),
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.center,
@@ -399,7 +452,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: score >= 9 ? Colors.black : AppColors.textOnPrimary,
+            color: _getScoreTextColor(score, isMiss: isMiss),
           ),
         ),
       ),
@@ -413,6 +466,13 @@ class MatchDetailView extends GetView<MatchDetailController> {
     if (score >= 5) return Colors.blue;
     if (score >= 3) return Colors.black;
     if (score >= 1) return Colors.white;
-    return Colors.grey; // Miss
+    return Colors.grey;
+  }
+
+  Color _getScoreTextColor(int score, {bool isMiss = false}) {
+    if (isMiss) return Colors.black;
+    if (score >= 9) return Colors.black;
+    if (score >= 3) return Colors.white;
+    return Colors.black; // scores 1-2 have white background
   }
 }

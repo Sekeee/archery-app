@@ -69,9 +69,9 @@ class MatchCard extends StatelessWidget {
                           color: AppColors.info.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'Range',
-                          style: TextStyle(
+                        child: Text(
+                          match['matchType'] ?? 'Range',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.info,
                           ),
@@ -94,30 +94,54 @@ class MatchCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${match['score']}',
+                  '${match['score'] ?? 0}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getRankColor(match['rank']),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '#${match['rank']}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textOnPrimary,
-                      fontWeight: FontWeight.bold,
+                if (match['rank'] != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getRankColor(match['rank'] as int),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '#${match['rank']}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textOnPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: match['isCompleted'] == true
+                          ? AppColors.success.withValues(alpha: 0.15)
+                          : AppColors.info.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      match['isCompleted'] == true ? 'Done' : 'In Progress',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: match['isCompleted'] == true
+                            ? AppColors.success
+                            : AppColors.info,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ],
