@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../controller/auth_controller.dart';
-import '../suite/components/auth_text_field.dart';
 import '../suite/components/auth_button.dart';
 
 class AuthView extends GetView<AuthController> {
@@ -29,25 +28,23 @@ class AuthView extends GetView<AuthController> {
                   color: AppColors.primary,
                 ),
                 const SizedBox(height: 24),
-                Obx(() => Text(
-                  controller.state.isLoginMode.value ? 'Welcome Back' : 'Create Account',
-                  style: const TextStyle(
+                const Text(
+                  'Welcome',
+                  style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
-                )),
+                ),
                 const SizedBox(height: 8),
-                Obx(() => Text(
-                  controller.state.isLoginMode.value
-                      ? 'Sign in to continue your training'
-                      : 'Join the archery training community',
-                  style: const TextStyle(
+                const Text(
+                  'Enter your phone number to continue',
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey,
+                    color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
-                )),
+                ),
                 const SizedBox(height: 40),
 
                 // Error message
@@ -59,115 +56,76 @@ class AuthView extends GetView<AuthController> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       controller.state.errorMessage.value,
-                      style: TextStyle(color: Colors.red.shade700),
+                      style: const TextStyle(color: AppColors.error),
                       textAlign: TextAlign.center,
                     ),
                   );
                 }),
 
-                // Name field (register only)
-                Obx(() {
-                  if (controller.state.isLoginMode.value) {
-                    return const SizedBox.shrink();
-                  }
-                  return Column(
-                    children: [
-                      AuthTextField(
-                        controller: controller.state.nameController,
-                        label: 'Full Name',
-                        hint: 'Enter your full name',
-                        prefixIcon: Icons.person_outline,
-                        validator: controller.validateName,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  );
-                }),
-
-                // Email field
-                AuthTextField(
-                  controller: controller.state.emailController,
-                  label: 'Email',
-                  hint: 'Enter your email',
-                  prefixIcon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: controller.validateEmail,
+                // Phone number field
+                const Text(
+                  'Phone Number',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: controller.state.phoneController,
+                  keyboardType: TextInputType.phone,
+                  validator: controller.validatePhone,
+                  decoration: InputDecoration(
+                    hintText: '8888 8888',
+                    hintStyle: const TextStyle(color: AppColors.textHint),
+                    prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.error, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.error, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
 
-                // Password field
-                Obx(() => AuthTextField(
-                  controller: controller.state.passwordController,
-                  label: 'Password',
-                  hint: 'Enter your password',
-                  prefixIcon: Icons.lock_outline,
-                  isPassword: true,
-                  isPasswordVisible: controller.state.isPasswordVisible.value,
-                  onTogglePassword: controller.togglePasswordVisibility,
-                  validator: controller.validatePassword,
-                )),
+                const SizedBox(height: 32),
 
-                // Confirm password field (register only)
-                Obx(() {
-                  if (controller.state.isLoginMode.value) {
-                    return const SizedBox.shrink();
-                  }
-                  return Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      AuthTextField(
-                        controller: controller.state.confirmPasswordController,
-                        label: 'Confirm Password',
-                        hint: 'Confirm your password',
-                        prefixIcon: Icons.lock_outline,
-                        isPassword: true,
-                        isPasswordVisible: controller.state.isPasswordVisible.value,
-                        onTogglePassword: controller.togglePasswordVisibility,
-                        validator: controller.validateConfirmPassword,
-                      ),
-                    ],
-                  );
-                }),
-
-                const SizedBox(height: 24),
-
-                // Submit button
+                // Continue button
                 Obx(() => AuthButton(
-                  text: controller.state.isLoginMode.value ? 'Sign In' : 'Sign Up',
+                  text: 'Continue',
                   isLoading: controller.state.isLoading.value,
-                  onPressed: controller.state.isLoginMode.value
-                      ? controller.login
-                      : controller.register,
+                  onPressed: controller.sendOtp,
                 )),
 
                 const SizedBox(height: 24),
 
-                // Toggle auth mode
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Obx(() => Text(
-                      controller.state.isLoginMode.value
-                          ? "Don't have an account? "
-                          : 'Already have an account? ',
-                      style: const TextStyle(color: AppColors.textSecondary),
-                    )),
-                    Obx(() => GestureDetector(
-                      onTap: controller.toggleAuthMode,
-                      child: Text(
-                        controller.state.isLoginMode.value ? 'Sign Up' : 'Sign In',
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )),
-                  ],
+                // Info text
+                const Text(
+                  'We will send you a verification code',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

@@ -6,109 +6,45 @@ import '../state/auth_state.dart';
 class AuthController extends GetxController {
   final state = AuthState();
 
-  void toggleAuthMode() {
-    state.isLoginMode.value = !state.isLoginMode.value;
-    state.errorMessage.value = '';
-    _clearForm();
-  }
-
-  void togglePasswordVisibility() {
-    state.isPasswordVisible.value = !state.isPasswordVisible.value;
-  }
-
-  void _clearForm() {
-    state.nameController.clear();
-    state.emailController.clear();
-    state.passwordController.clear();
-    state.confirmPasswordController.clear();
-  }
-
-  Future<void> login() async {
+  Future<void> sendOtp() async {
     if (!state.formKey.currentState!.validate()) return;
 
     state.isLoading.value = true;
     state.errorMessage.value = '';
 
     try {
-      // TODO: Implement actual login logic
+      // TODO: Implement actual Firebase phone auth
       await Future.delayed(const Duration(seconds: 2));
       
-      // Navigate to home on success
-      Get.offAllNamed(AppRoutes.home);
+      final phoneNumber = state.phoneController.text;
+      
+      // Navigate to OTP screen
+      Get.toNamed(AppRoutes.otp, arguments: {'phoneNumber': phoneNumber});
     } catch (e) {
-      state.errorMessage.value = 'Login failed. Please try again.';
+      state.errorMessage.value = 'Failed to send OTP. Please try again.';
     } finally {
       state.isLoading.value = false;
     }
   }
 
-  Future<void> register() async {
-    if (!state.formKey.currentState!.validate()) return;
-
-    if (state.passwordController.text != state.confirmPasswordController.text) {
-      state.errorMessage.value = 'Passwords do not match';
-      return;
-    }
-
-    state.isLoading.value = true;
-    state.errorMessage.value = '';
-
-    try {
-      // TODO: Implement actual registration logic
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Navigate to home on success
-      Get.offAllNamed(AppRoutes.home);
-    } catch (e) {
-      state.errorMessage.value = 'Registration failed. Please try again.';
-    } finally {
-      state.isLoading.value = false;
-    }
-  }
-
-  String? validateEmail(String? value) {
+  String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'Phone number is required';
     }
-    if (!GetUtils.isEmail(value)) {
-      return 'Please enter a valid email';
+    if (value.length < 8) {
+      return 'Please enter a valid phone number';
     }
-    return null;
-  }
-
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return null;
-  }
-
-  String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Name is required';
-    }
-    return null;
-  }
-
-  String? validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
-    if (value != state.passwordController.text) {
-      return 'Passwords do not match';
+    // Remove any non-digit characters for validation
+    final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length < 8) {
+      return 'Please enter a valid phone number';
     }
     return null;
   }
 
   @override
   void onClose() {
-    state.nameController.dispose();
-    state.emailController.dispose();
-    state.passwordController.dispose();
-    state.confirmPasswordController.dispose();
+    state.phoneController.dispose();
     super.onClose();
   }
 }
