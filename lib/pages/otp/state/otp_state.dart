@@ -22,6 +22,12 @@ class OtpState {
   // Phone number
   final RxString phoneNumber = ''.obs;
   
+  // Firebase verification ID
+  final RxString verificationId = ''.obs;
+  
+  // Resend token for Firebase
+  int? resendToken;
+  
   // Error message
   final RxString errorMessage = ''.obs;
   

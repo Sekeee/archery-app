@@ -13,4 +13,10 @@ class AuthState {
   
   // Error message
   final RxString errorMessage = ''.obs;
+  
+  // Firebase verification ID
+  final RxString verificationId = ''.obs;
+  
+  // Resend token for Firebase
+  int? resendToken;
 }

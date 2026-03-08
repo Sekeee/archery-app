@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/services/user_service.dart';
 import '../../../routes/app_routes.dart';
 import '../state/profile_setup_state.dart';
 
 class ProfileSetupController extends GetxController {
   final state = ProfileSetupState();
   final ImagePicker _picker = ImagePicker();
+  final UserService _userService = UserService();
 
   Future<void> pickImage(ImageSource source) async {
     try {
@@ -78,8 +80,11 @@ class ProfileSetupController extends GetxController {
     state.errorMessage.value = '';
 
     try {
-      // TODO: Upload profile image and save username to backend
-      await Future.delayed(const Duration(seconds: 1));
+      // Create user in Firestore with optional profile image
+      await _userService.createUser(
+        username: state.usernameController.text.trim(),
+        profileImage: state.profileImage.value,
+      );
       
       // Navigate to home
       Get.offAllNamed(AppRoutes.home);

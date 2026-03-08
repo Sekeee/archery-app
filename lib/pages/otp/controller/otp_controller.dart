@@ -1,19 +1,25 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../../core/services/user_service.dart';
 import '../../../routes/app_routes.dart';
 import '../state/otp_state.dart';
 
 class OtpController extends GetxController {
   final state = OtpState();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserService _userService = UserService();
 
   @override
   void onInit() {
     super.onInit();
-    // Get phone number from arguments
+    // Get arguments from auth screen
     final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null && args.containsKey('phoneNumber')) {
-      state.phoneNumber.value = args['phoneNumber'];
+    if (args != null) {
+      state.phoneNumber.value = args['phoneNumber'] ?? '';
+      state.verificationId.value = args['verificationId'] ?? '';
+      state.resendToken = args['resendToken'];
     }
     _startResendTimer();
   }
@@ -60,18 +66,44 @@ class OtpController extends GetxController {
     state.errorMessage.value = '';
 
     try {
-      // TODO: Implement actual Firebase OTP verification
-      await Future.delayed(const Duration(seconds: 2));
+      // Create credential from verification ID and OTP
+      final credential = PhoneAuthProvider.credential(
+        verificationId: state.verificationId.value,
+        smsCode: state.otpCode,
+      );
       
-      // TODO: Check if user exists in database
-      // For now, always go to profile setup (new user flow)
-      // When API is ready, check if user profile exists and navigate accordingly
-      Get.offAllNamed(AppRoutes.profileSetup);
+      // Sign in with credential
+      final userCredential = await _auth.signInWithCredential(credential);
+      
+      // Check if user profile exists in Firestore
+      final userExists = await _userService.userExists(userCredential.user!.uid);
+      
+      if (userExists) {
+        // Existing user - go to home
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        // New user - go to profile setup
+        Get.offAllNamed(AppRoutes.profileSetup);
+      }
+    } on FirebaseAuthException catch (e) {
+      state.errorMessage.value = _getErrorMessage(e.code);
+      _clearOtp();
     } catch (e) {
-      state.errorMessage.value = 'Invalid OTP. Please try again.';
+      state.errorMessage.value = 'Verification failed. Please try again.';
       _clearOtp();
     } finally {
       state.isLoading.value = false;
+    }
+  }
+  
+  String _getErrorMessage(String code) {
+    switch (code) {
+      case 'invalid-verification-code':
+        return 'Invalid OTP. Please check and try again.';
+      case 'session-expired':
+        return 'OTP expired. Please request a new one.';
+      default:
+        return 'Verification failed. Please try again.';
     }
   }
 
@@ -82,20 +114,42 @@ class OtpController extends GetxController {
     state.errorMessage.value = '';
 
     try {
-      // TODO: Implement actual resend OTP logic
-      await Future.delayed(const Duration(seconds: 2));
-      
-      _clearOtp();
-      _startResendTimer();
-      
-      Get.snackbar(
-        'OTP Sent',
-        'A new verification code has been sent',
-        snackPosition: SnackPosition.BOTTOM,
+      await _auth.verifyPhoneNumber(
+        phoneNumber: state.phoneNumber.value,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          final userCredential = await _auth.signInWithCredential(credential);
+          final userExists = await _userService.userExists(userCredential.user!.uid);
+          if (userExists) {
+            Get.offAllNamed(AppRoutes.home);
+          } else {
+            Get.offAllNamed(AppRoutes.profileSetup);
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          state.isResending.value = false;
+          state.errorMessage.value = _getErrorMessage(e.code);
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          state.isResending.value = false;
+          state.verificationId.value = verificationId;
+          state.resendToken = resendToken;
+          _clearOtp();
+          _startResendTimer();
+          
+          Get.snackbar(
+            'OTP Sent',
+            'A new verification code has been sent',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          state.verificationId.value = verificationId;
+        },
+        forceResendingToken: state.resendToken,
+        timeout: const Duration(seconds: 60),
       );
     } catch (e) {
       state.errorMessage.value = 'Failed to resend OTP. Please try again.';
-    } finally {
       state.isResending.value = false;
     }
   }

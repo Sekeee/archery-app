@@ -71,7 +71,7 @@ class AuthView extends GetView<AuthController> {
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(8)],
                   validator: controller.validatePhone,
                   decoration: InputDecoration(
-                    hintText: '94240004',
+                    hintText: '',
                     counterText: '',
                     hintStyle: const TextStyle(color: AppColors.textHint),
                     prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
