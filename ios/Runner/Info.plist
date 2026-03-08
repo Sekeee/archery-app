@@ -52,7 +52,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.example.archeryApp</string>
+				<string>mn.zurgaadai.archeryApp</string>
 			</array>
 		</dict>
 		<dict>
