@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -78,7 +79,7 @@ class MatchCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        match['date'],
+                        _formatDate(match['date']),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -136,5 +137,14 @@ class MatchCard extends StatelessWidget {
       default:
         return AppColors.primary;
     }
+  }
+
+  String _formatDate(dynamic date) {
+    if (date is DateTime) {
+      return DateFormat('MMM d').format(date);
+    } else if (date is String) {
+      return date;
+    }
+    return '';
   }
 }

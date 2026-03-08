@@ -17,8 +17,8 @@ class SplashView extends GetWidget<SplashController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 200,
-              height: 200,
+              width: Get.width * 0.6,
+              height: Get.height * 0.2,
               child: RiveWidgetBuilder(
                 fileLoader: FileLoader.fromAsset('assets/no-background.riv', riveFactory: Factory.rive),
                 builder: (context, state) {

@@ -63,8 +63,10 @@ class OtpController extends GetxController {
       // TODO: Implement actual Firebase OTP verification
       await Future.delayed(const Duration(seconds: 2));
       
-      // Navigate to home on success
-      Get.offAllNamed(AppRoutes.home);
+      // TODO: Check if user exists in database
+      // For now, always go to profile setup (new user flow)
+      // When API is ready, check if user profile exists and navigate accordingly
+      Get.offAllNamed(AppRoutes.profileSetup);
     } catch (e) {
       state.errorMessage.value = 'Invalid OTP. Please try again.';
       _clearOtp();

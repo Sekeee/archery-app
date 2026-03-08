@@ -31,13 +31,9 @@ class AuthController extends GetxController {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
-    if (value.length < 8) {
-      return 'Please enter a valid phone number';
-    }
-    // Remove any non-digit characters for validation
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-    if (digitsOnly.length < 8) {
-      return 'Please enter a valid phone number';
+    if (digitsOnly.length != 8) {
+      return 'Phone number must be exactly 8 digits';
     }
     return null;
   }

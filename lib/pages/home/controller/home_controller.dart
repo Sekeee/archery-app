@@ -26,17 +26,25 @@ class HomeController extends GetxController {
     state.recentMatches.value = [
       {
         'name': 'March 03 Morning Class',
+        'matchType': 'Range',
         'category': 'Range',
-        'date': '2026-03-03',
+        'date': DateTime(2026, 3, 3),
+        'ends': 10,
+        'arrowsPerEnd': 3,
         'score': 186,
         'rank': 3,
+        'isCompleted': true,
       },
       {
         'name': 'March 05 Training',
+        'matchType': 'Moving Object',
         'category': 'Moving Object',
-        'date': '2026-03-05',
+        'date': DateTime(2026, 3, 5),
+        'ends': 10,
+        'arrowsPerEnd': 3,
         'score': 172,
         'rank': 1,
+        'isCompleted': true,
       },
     ];
   }
@@ -46,21 +54,11 @@ class HomeController extends GetxController {
   }
 
   void createNewMatch() {
-    // TODO: Navigate to create match screen
-    Get.snackbar(
-      'Coming Soon',
-      'Create match feature will be available soon',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    Get.toNamed(AppRoutes.newMatch);
   }
 
   void viewMatchDetails(Map<String, dynamic> match) {
-    // TODO: Navigate to match details
-    Get.snackbar(
-      match['name'],
-      'Score: ${match['score']} | Rank: #${match['rank']}',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    Get.toNamed(AppRoutes.matchDetail, arguments: match);
   }
 
   void logout() {

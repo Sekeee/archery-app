@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -22,27 +23,17 @@ class AuthView extends GetView<AuthController> {
               children: [
                 const SizedBox(height: 60),
                 // Header
-                const Icon(
-                  Icons.sports_martial_arts,
-                  size: 80,
-                  color: AppColors.primary,
-                ),
+                const Icon(Icons.sports, size: 80, color: AppColors.primary),
                 const SizedBox(height: 24),
                 const Text(
                   'Welcome',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Enter your phone number to continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -70,27 +61,23 @@ class AuthView extends GetView<AuthController> {
                 // Phone number field
                 const Text(
                   'Phone Number',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: controller.state.phoneController,
                   keyboardType: TextInputType.phone,
+                  maxLength: 8,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(8)],
                   validator: controller.validatePhone,
                   decoration: InputDecoration(
-                    hintText: '8888 8888',
+                    hintText: '94240004',
+                    counterText: '',
                     hintStyle: const TextStyle(color: AppColors.textHint),
                     prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
                     filled: true,
                     fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: AppColors.primary, width: 2),
@@ -110,21 +97,20 @@ class AuthView extends GetView<AuthController> {
                 const SizedBox(height: 32),
 
                 // Continue button
-                Obx(() => AuthButton(
-                  text: 'Continue',
-                  isLoading: controller.state.isLoading.value,
-                  onPressed: controller.sendOtp,
-                )),
+                Obx(
+                  () => AuthButton(
+                    text: 'Continue',
+                    isLoading: controller.state.isLoading.value,
+                    onPressed: controller.sendOtp,
+                  ),
+                ),
 
                 const SizedBox(height: 24),
 
                 // Info text
                 const Text(
                   'We will send you a verification code',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
               ],
