@@ -10,7 +10,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.surfaceColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -25,20 +25,21 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                       const SizedBox(height: 40),
                       
                       // Header
-                      const Text(
+                      Text(
                         'Set Up Your Profile',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          color: context.textPrimaryColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Add a photo and choose a username',
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondaryColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -76,7 +77,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                 height: 120,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.background,
+                                  color: context.backgroundColor,
                                   border: Border.all(
                                     color: AppColors.primary.withValues(alpha: 0.3),
                                     width: 3,
@@ -89,10 +90,10 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                                       : null,
                                 ),
                                 child: controller.state.profileImage.value == null
-                                    ? const Icon(
+                                    ? Icon(
                                         Icons.person,
                                         size: 60,
-                                        color: AppColors.textSecondary,
+                                        color: context.textSecondaryColor,
                                       )
                                     : null,
                               ),
@@ -118,11 +119,11 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                       ),
                       
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Tap to add photo',
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondaryColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -130,12 +131,12 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                       const SizedBox(height: 32),
 
                       // Username field
-                      const Text(
+                      Text(
                         'Username',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.textPrimaryColor,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -145,10 +146,10 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
                         textCapitalization: TextCapitalization.words,
                         decoration: InputDecoration(
                           hintText: 'Enter your name',
-                          hintStyle: const TextStyle(color: AppColors.textHint),
-                          prefixIcon: const Icon(Icons.person_outline, color: AppColors.textSecondary),
+                          hintStyle: TextStyle(color: context.textHintColor),
+                          prefixIcon: Icon(Icons.person_outline, color: context.textSecondaryColor),
                           filled: true,
-                          fillColor: AppColors.background,
+                          fillColor: context.backgroundColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -178,7 +179,7 @@ class ProfileSetupView extends GetView<ProfileSetupController> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.surfaceColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),

@@ -10,43 +10,43 @@ class HistoryView extends GetView<HistoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'History',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.textPrimaryColor,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.history_outlined,
               size: 80,
-              color: AppColors.textSecondary,
+              color: context.textSecondaryColor,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'History',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: context.textPrimaryColor,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Coming Soon',
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: context.textSecondaryColor,
               ),
             ),
           ],

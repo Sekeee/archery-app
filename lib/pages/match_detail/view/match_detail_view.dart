@@ -11,18 +11,18 @@ class MatchDetailView extends GetView<MatchDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
+          icon: Icon(Icons.chevron_left, color: context.textPrimaryColor),
           onPressed: controller.exitMatch,
         ),
         title: Obx(() => Text(
           controller.state.matchName.value,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: context.textPrimaryColor,
             fontWeight: FontWeight.bold,
           ),
         )),
@@ -35,25 +35,28 @@ class MatchDetailView extends GetView<MatchDetailController> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.save_outlined, color: AppColors.textPrimary),
+                : Icon(Icons.save_outlined, color: context.textPrimaryColor),
             onPressed: controller.state.isLoading.value ? null : controller.saveMatch,
           )),
         ],
       ),
-      body: Column(
+      body: Builder(
+        builder: (context) => Column(
         children: [
           // Match info header
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppColors.surface,
+            color: context.surfaceColor,
             child: Row(
               children: [
                 Obx(() => _buildInfoChip(
+                  context,
                   icon: Icons.category,
                   label: controller.state.matchType.value,
                 )),
                 const SizedBox(width: 12),
                 Obx(() => _buildInfoChip(
+                  context,
                   icon: Icons.calendar_today,
                   label: DateFormat('MMM d').format(controller.state.matchDate.value),
                 )),
@@ -80,7 +83,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
           // End tabs
           Container(
             height: 50,
-            color: AppColors.surface,
+            color: context.surfaceColor,
             child: Obx(() => ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -102,14 +105,14 @@ class MatchDetailView extends GetView<MatchDetailController> {
                           ? AppColors.primary
                           : isComplete
                               ? AppColors.primary.withValues(alpha: 0.2)
-                              : AppColors.background,
+                              : context.backgroundColor,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       'End ${index + 1}',
                       style: TextStyle(
-                        color: isSelected ? AppColors.textOnPrimary : AppColors.textPrimary,
+                        color: isSelected ? AppColors.textOnPrimary : context.textPrimaryColor,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -139,7 +142,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -176,10 +179,10 @@ class MatchDetailView extends GetView<MatchDetailController> {
                           height: 60,
                           margin: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
-                            color: score >= 0 ? _getScoreColor(score) : AppColors.background,
+                            color: score >= 0 ? _getScoreColor(score) : context.backgroundColor,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: score >= 0 ? _getScoreColor(score) : AppColors.textSecondary,
+                              color: score >= 0 ? _getScoreColor(score) : context.textSecondaryColor,
                               width: 2,
                             ),
                           ),
@@ -191,7 +194,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                               fontWeight: FontWeight.bold,
                               color: score >= 0 
                                   ? (score >= 9 ? Colors.black : AppColors.textOnPrimary)
-                                  : AppColors.textSecondary,
+                                  : context.textSecondaryColor,
                             ),
                           ),
                         );
@@ -209,7 +212,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -240,7 +243,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.surfaceColor,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -260,7 +263,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                     Icons.chevron_left,
                     color: controller.state.currentEnd.value > 1
                         ? AppColors.primary
-                        : AppColors.textSecondary,
+                        : context.textSecondaryColor,
                   ),
                 )),
                 
@@ -278,7 +281,7 @@ class MatchDetailView extends GetView<MatchDetailController> {
                       const SizedBox(height: 4),
                       LinearProgressIndicator(
                         value: controller.state.currentEnd.value / controller.state.totalEnds.value,
-                        backgroundColor: AppColors.background,
+                        backgroundColor: context.backgroundColor,
                         valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                       ),
                     ],
@@ -303,23 +306,23 @@ class MatchDetailView extends GetView<MatchDetailController> {
             ),
           ),
         ],
-      ),
+      )),
     );
   }
 
-  Widget _buildInfoChip({required IconData icon, required String label}) {
+  Widget _buildInfoChip(BuildContext context, {required IconData icon, required String label}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.backgroundColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.textSecondary),
+          Icon(icon, size: 16, color: context.textSecondaryColor),
           const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontSize: 14)),
+          Text(label, style: TextStyle(fontSize: 14, color: context.textPrimaryColor)),
         ],
       ),
     );

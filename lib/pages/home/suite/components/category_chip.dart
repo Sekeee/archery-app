@@ -21,16 +21,16 @@ class CategoryChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surface,
+          color: isSelected ? AppColors.primary : context.surfaceColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : context.borderColor,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppColors.textOnPrimary : AppColors.textPrimary,
+            color: isSelected ? AppColors.textOnPrimary : context.textPrimaryColor,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

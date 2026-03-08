@@ -11,12 +11,12 @@ class OtpView extends GetView<OtpController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimaryColor),
           onPressed: controller.goBack,
         ),
       ),
@@ -34,20 +34,21 @@ class OtpView extends GetView<OtpController> {
                 color: AppColors.primary,
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Verification',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  color: context.textPrimaryColor,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Obx(() => Text(
                 'Enter the code sent to\n${controller.state.phoneNumber.value}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: AppColors.textSecondary,
+                  color: context.textSecondaryColor,
                 ),
                 textAlign: TextAlign.center,
               )),
@@ -147,8 +148,8 @@ class OtpView extends GetView<OtpController> {
                   }
                   return Text(
                     'Resend code in ${controller.state.resendTimer.value}s',
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: context.textSecondaryColor,
                       fontSize: 14,
                     ),
                   );
@@ -161,10 +162,10 @@ class OtpView extends GetView<OtpController> {
               Center(
                 child: GestureDetector(
                   onTap: controller.goBack,
-                  child: const Text(
+                  child: Text(
                     'Change phone number',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: context.textSecondaryColor,
                       fontSize: 14,
                       decoration: TextDecoration.underline,
                     ),

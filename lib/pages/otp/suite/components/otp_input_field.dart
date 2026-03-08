@@ -37,10 +37,10 @@ class OtpInputField extends StatelessWidget {
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           maxLength: 1,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: context.textPrimaryColor,
           ),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -48,7 +48,7 @@ class OtpInputField extends StatelessWidget {
           decoration: InputDecoration(
             counterText: '',
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: context.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

@@ -11,7 +11,7 @@ class SplashView extends GetWidget<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.surfaceColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -30,12 +30,12 @@ class SplashView extends GetWidget<SplashController> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Archery Training',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: context.textPrimaryColor),
             ),
             const SizedBox(height: 8),
-            const Text('Track your progress', style: TextStyle(fontSize: 16, color: AppColors.textSecondary)),
+            Text('Track your progress', style: TextStyle(fontSize: 16, color: context.textSecondaryColor)),
           ],
         ),
       ),

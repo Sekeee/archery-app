@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
 
+import '../../../core/services/user_service.dart';
 import '../../../routes/app_routes.dart';
 import '../state/home_state.dart';
 
 class HomeController extends GetxController {
   final state = HomeState();
+  final UserService _userService = UserService();
 
   @override
   void onInit() {
@@ -13,12 +15,38 @@ class HomeController extends GetxController {
     _loadRecentMatches();
   }
 
-  void _loadUserData() {
-    // TODO: Load actual user data
-    state.userName.value = 'Archer';
-    state.totalMatches.value = 12;
-    state.averageScore.value = 184;
-    state.bestScore.value = 198;
+  Future<void> _loadUserData() async {
+    state.isLoading.value = true;
+    try {
+      final user = await _userService.getCurrentUser();
+      if (user != null) {
+        state.currentUser.value = user;
+        state.userName.value = user.username;
+        state.photoUrl.value = user.photoUrl;
+        
+        // Load stats for selected category
+        _updateCategoryStats();
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    } finally {
+      state.isLoading.value = false;
+    }
+  }
+
+  void _updateCategoryStats() {
+    final user = state.currentUser.value;
+    if (user == null) return;
+    
+    final stats = user.getStats(state.selectedCategory.value);
+    state.totalMatches.value = stats.totalMatches;
+    state.avgAccuracy.value = stats.avgAccuracy;
+    state.bestScore.value = stats.bestScore;
+  }
+
+  void onCategorySelected(String category) {
+    state.selectedCategory.value = category;
+    _updateCategoryStats();
   }
 
   void _loadRecentMatches() {
@@ -51,6 +79,10 @@ class HomeController extends GetxController {
 
   void onBottomNavTap(int index) {
     state.selectedIndex.value = index;
+    // Refresh user data when returning to home tab
+    if (index == 0) {
+      refreshUserData();
+    }
   }
 
   void createNewMatch() {
@@ -61,8 +93,12 @@ class HomeController extends GetxController {
     Get.toNamed(AppRoutes.matchDetail, arguments: match);
   }
 
-  void logout() {
-    // TODO: Implement actual logout
+  Future<void> logout() async {
+    await _userService.signOut();
     Get.offAllNamed(AppRoutes.auth);
+  }
+
+  Future<void> refreshUserData() async {
+    await _loadUserData();
   }
 }

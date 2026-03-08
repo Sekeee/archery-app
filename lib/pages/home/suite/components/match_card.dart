@@ -21,11 +21,11 @@ class MatchCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.border,
+              color: context.borderColor,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -69,9 +69,9 @@ class MatchCard extends StatelessWidget {
                           color: AppColors.info.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Text(
-                          match['category'],
-                          style: const TextStyle(
+                        child: const Text(
+                          'Range',
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.info,
                           ),
@@ -80,9 +80,9 @@ class MatchCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         _formatDate(match['date']),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.textSecondaryColor,
                         ),
                       ),
                     ],

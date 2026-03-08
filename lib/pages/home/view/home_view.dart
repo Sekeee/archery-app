@@ -24,11 +24,11 @@ class HomeView extends GetView<HomeController> {
     Get.lazyPut(() => ProfileController());
     
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Obx(() => IndexedStack(
         index: controller.state.selectedIndex.value,
         children: [
-          _buildHomeContent(),
+          _buildHomeContent(context),
           const RankingsView(),
           const HistoryView(),
           const ProfileView(),
@@ -66,11 +66,14 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _buildHomeContent() {
+  Widget _buildHomeContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         title: Obx(
           () => Column(
@@ -78,7 +81,11 @@ class HomeView extends GetView<HomeController> {
             children: [
               Text(
                 controller.state.userName.value,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                style: TextStyle(
+                  fontSize: 20, 
+                  fontWeight: FontWeight.bold, 
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
             ],
           ),
@@ -90,7 +97,7 @@ class HomeView extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Stats section
-            const Text('Your Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Your Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 12),
             Obx(
               () => Row(
@@ -106,8 +113,8 @@ class HomeView extends GetView<HomeController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: StatCard(
-                      title: 'Avg Score',
-                      value: controller.state.averageScore.value.toString(),
+                      title: 'Accuracy',
+                      value: '${controller.state.avgAccuracy.value.toStringAsFixed(1)}%',
                       icon: Icons.analytics,
                       color: Colors.green,
                     ),
@@ -128,7 +135,7 @@ class HomeView extends GetView<HomeController> {
             const SizedBox(height: 24),
 
             // Categories section
-            const Text('Categories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Categories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 12),
             SizedBox(
               height: 40,
@@ -148,7 +155,7 @@ class HomeView extends GetView<HomeController> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Recent Matches', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Recent Matches', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                 TextButton(onPressed: () {}, child: const Text('See All')),
               ],
             ),
@@ -157,12 +164,12 @@ class HomeView extends GetView<HomeController> {
               if (controller.state.recentMatches.isEmpty) {
                 return Container(
                   padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
-                  child: const Center(
+                  decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(12)),
+                  child: Center(
                     child: Text(
                       'No matches yet.\nStart training!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
                     ),
                   ),
                 );

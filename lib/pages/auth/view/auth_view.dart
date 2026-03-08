@@ -12,7 +12,7 @@ class AuthView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.surfaceColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -31,9 +31,9 @@ class AuthView extends GetView<AuthController> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Enter your phone number to continue',
-                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 16, color: context.textSecondaryColor),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -59,9 +59,9 @@ class AuthView extends GetView<AuthController> {
                 }),
 
                 // Phone number field
-                const Text(
+                Text(
                   'Phone Number',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimaryColor),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -73,10 +73,10 @@ class AuthView extends GetView<AuthController> {
                   decoration: InputDecoration(
                     hintText: '',
                     counterText: '',
-                    hintStyle: const TextStyle(color: AppColors.textHint),
-                    prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                    hintStyle: TextStyle(color: context.textHintColor),
+                    prefixIcon: Icon(Icons.phone_outlined, color: context.textSecondaryColor),
                     filled: true,
-                    fillColor: AppColors.background,
+                    fillColor: context.backgroundColor,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -108,9 +108,9 @@ class AuthView extends GetView<AuthController> {
                 const SizedBox(height: 24),
 
                 // Info text
-                const Text(
+                Text(
                   'We will send you a verification code',
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 14, color: context.textSecondaryColor),
                   textAlign: TextAlign.center,
                 ),
               ],

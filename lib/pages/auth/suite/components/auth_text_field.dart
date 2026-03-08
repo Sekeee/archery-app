@@ -33,10 +33,10 @@ class AuthTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: context.textPrimaryColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -47,21 +47,21 @@ class AuthTextField extends StatelessWidget {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.textHint),
-            prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
+            hintStyle: TextStyle(color: context.textHintColor),
+            prefixIcon: Icon(prefixIcon, color: context.textSecondaryColor),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
                       isPasswordVisible
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: AppColors.textSecondary,
+                      color: context.textSecondaryColor,
                     ),
                     onPressed: onTogglePassword,
                   )
                 : null,
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: context.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

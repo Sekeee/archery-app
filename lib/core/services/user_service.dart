@@ -16,8 +16,7 @@ class UserService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Collection reference
-  CollectionReference<Map<String, dynamic>> get _usersCollection =>
-      _firestore.collection('users');
+  CollectionReference<Map<String, dynamic>> get _usersCollection => _firestore.collection('users');
 
   /// Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
@@ -43,10 +42,7 @@ class UserService {
   }
 
   /// Create new user in Firestore
-  Future<UserModel> createUser({
-    required String username,
-    File? profileImage,
-  }) async {
+  Future<UserModel> createUser({required String username, File? profileImage}) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('No authenticated user');
 
@@ -74,22 +70,16 @@ class UserService {
   /// Upload profile image to Firebase Storage
   Future<String> _uploadProfileImage(String uid, File image) async {
     final ref = _storage.ref().child('users/$uid/profile.jpg');
-    
+
     // Upload file
-    await ref.putFile(
-      image,
-      SettableMetadata(contentType: 'image/jpeg'),
-    );
+    await ref.putFile(image, SettableMetadata(contentType: 'image/jpeg'));
 
     // Get download URL
     return await ref.getDownloadURL();
   }
 
   /// Update user profile
-  Future<void> updateUser({
-    String? username,
-    File? profileImage,
-  }) async {
+  Future<void> updateUser({String? username, File? profileImage}) async {
     final uid = currentUserId;
     if (uid == null) throw Exception('No authenticated user');
 
@@ -126,7 +116,8 @@ class UserService {
 
     // Calculate new averages for this category
     final newTotalMatches = currentStats.totalMatches + 1;
-    final newAvgAccuracy = ((currentStats.avgAccuracy * currentStats.totalMatches) + newMatchAccuracy) / newTotalMatches;
+    final newAvgAccuracy =
+        ((currentStats.avgAccuracy * currentStats.totalMatches) + newMatchAccuracy) / newTotalMatches;
     final newBestScore = newMatchScore > currentStats.bestScore ? newMatchScore : currentStats.bestScore;
 
     // Update only this category's stats

@@ -30,7 +30,7 @@ class AuthController extends GetxController {
         verificationFailed: (FirebaseAuthException e) {
           log('Verification Failed: ${e.code} - ${e.message}');
           state.isLoading.value = false;
-          state.errorMessage.value = '${e.code}: ${e.message}';
+          state.errorMessage.value = _getErrorMessage(e.code);
         },
         codeSent: (String verificationId, int? resendToken) {
           state.isLoading.value = false;
