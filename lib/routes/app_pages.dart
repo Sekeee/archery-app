@@ -14,6 +14,8 @@ import '../pages/new_match/controller/new_match_controller.dart';
 import '../pages/new_match/view/new_match_view.dart';
 import '../pages/match_detail/controller/match_detail_controller.dart';
 import '../pages/match_detail/view/match_detail_view.dart';
+import '../pages/all_matches/controller/all_matches_controller.dart';
+import '../pages/all_matches/view/all_matches_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -65,6 +67,13 @@ class AppPages {
       page: () => const MatchDetailView(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => MatchDetailController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.allMatches,
+      page: () => const AllMatchesView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => AllMatchesController());
       }),
     ),
   ];

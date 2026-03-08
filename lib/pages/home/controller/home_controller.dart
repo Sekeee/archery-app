@@ -93,6 +93,20 @@ class HomeController extends GetxController {
     Get.toNamed(AppRoutes.matchDetail, arguments: match);
   }
 
+  void viewAllMatches() {
+    Get.toNamed(AppRoutes.allMatches, arguments: {
+      'category': state.selectedCategory.value,
+    });
+  }
+
+  /// Get recent matches filtered by selected category
+  List<Map<String, dynamic>> get filteredRecentMatches {
+    final category = state.selectedCategory.value;
+    return state.recentMatches
+        .where((match) => match['category'] == category)
+        .toList();
+  }
+
   Future<void> logout() async {
     await _userService.signOut();
     Get.offAllNamed(AppRoutes.auth);

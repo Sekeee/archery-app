@@ -6,4 +6,5 @@ abstract class AppRoutes {
   static const home = '/home';
   static const newMatch = '/new-match';
   static const matchDetail = '/match-detail';
+  static const allMatches = '/all-matches';
 }

@@ -27,8 +27,13 @@ class ThemeService extends GetxService {
   
   void _loadTheme() {
     try {
+      // Default to dark mode if no preference saved
       final isDark = _storage?.read<bool>(_key) ?? true;
       themeMode.value = isDark ? ThemeMode.dark : ThemeMode.light;
+      // Ensure dark mode is saved as default
+      if (_storage?.read<bool>(_key) == null) {
+        _storage?.write(_key, true);
+      }
     } catch (e) {
       debugPrint('ThemeService load error: $e');
     }

@@ -96,8 +96,37 @@ class HomeView extends GetView<HomeController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Categories section (moved to top)
+            Text('Categories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 40,
+              child: Obx(() {
+                // Access the observable to trigger rebuild
+                final selectedCategory = controller.state.selectedCategory.value;
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: controller.state.categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final category = controller.state.categories[index];
+                    return CategoryChip(
+                      label: category,
+                      isSelected: selectedCategory == category,
+                      onTap: () => controller.onCategorySelected(category),
+                    );
+                  },
+                );
+              }),
+            ),
+
+            const SizedBox(height: 24),
+
             // Stats section
-            Text('Your Stats', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            Obx(() => Text(
+              '${controller.state.selectedCategory.value} Stats',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+            )),
             const SizedBox(height: 12),
             Obx(
               () => Row(
@@ -134,40 +163,27 @@ class HomeView extends GetView<HomeController> {
 
             const SizedBox(height: 24),
 
-            // Categories section
-            Text('Categories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.state.categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  return CategoryChip(label: controller.state.categories[index], isSelected: index == 0, onTap: () {});
-                },
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
             // Recent matches section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Recent Matches', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                TextButton(onPressed: () {}, child: const Text('See All')),
+                Obx(() => Text(
+                  '${controller.state.selectedCategory.value} Matches',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                )),
+                TextButton(onPressed: controller.viewAllMatches, child: const Text('See All')),
               ],
             ),
             const SizedBox(height: 12),
             Obx(() {
-              if (controller.state.recentMatches.isEmpty) {
+              final matches = controller.filteredRecentMatches;
+              if (matches.isEmpty) {
                 return Container(
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(12)),
                   child: Center(
                     child: Text(
-                      'No matches yet.\nStart training!',
+                      'No ${controller.state.selectedCategory.value} matches yet.\nStart training!',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
                     ),
@@ -176,7 +192,7 @@ class HomeView extends GetView<HomeController> {
               }
               return Column(
                 children:
-                    controller.state.recentMatches
+                    matches
                         .map(
                           (match) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
